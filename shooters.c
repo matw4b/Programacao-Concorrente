@@ -53,7 +53,6 @@ void* pthread_shooter(void* id_pointer){
 	while(!stop_flag){
 		
 		reload =  3 + (rand() % 8); /*determina quanto o atirador pegara dessa vez. Podendo pegar de 3 a 10 municoes com a mao*/
-		srand(time(NULL));
 		printf("Atirador %d recarregando.\n", id);
 		sleep(3);
 		pthread_mutex_lock(&supply_lock);
