@@ -46,12 +46,13 @@ individual_data final_report[NUMBER_OF_SHOOTERS]; /*vetor para exibir o resultad
 void* pthread_shooter(void* id_pointer){
 
 	int id = *((int *) id_pointer);
-	int i, reload, score, luck;
+	int i, reload, score, luck, hits; /*score eh a pontuação individual do competidor, enquanto hits eh o numero de acertos naquela rodada de arremecos*/
 	int stop_flag = FALSE; /* flag para parar de atirar, se a municao acabar, setamos ela para true */
 	score = 0;
 
 	while(!stop_flag){
 		
+		hits = 0;
 		reload =  3 + (rand() % 8); /*determina quanto o atirador pegara dessa vez. Podendo pegar de 3 a 10 municoes com a mao*/
 		printf("Atirador %d recarregando.\n", id);
 		sleep(3);
@@ -59,7 +60,7 @@ void* pthread_shooter(void* id_pointer){
 		if(global_supply>=reload)
 			global_supply = global_supply - reload; /*pega as municoes para si.*/
 		else if(global_supply < reload && global_supply > 0){ /*poderia carregar mais, porem tinha menos municao disponivel do que a sua capacidade*/
-			reload = global_supply;							/*entao ele pega tudo e faz os ultimos arremecos da partida */
+			reload = global_supply;	/*entao ele pega tudo e faz os ultimos arremecos da partida */
 			global_supply = 0;
 			stop_flag = TRUE;
 		}
@@ -77,12 +78,13 @@ void* pthread_shooter(void* id_pointer){
 			luck = 1 + (rand()%10); /*sorte eh uma variavel que determina a chance de acertar o alvo*/
 			if(luck>=9){ /*se a sorte do atirador for 9 ou maior, ele acerta o alvo, ou seja, tem 20% de chance de acerto*/
 				score++;
+				hits++;
 			}
 		}
 		printf("Disparos realizados pelo atirador %d: %d\n", id, reload);
 		final_report[id-1].fired_shots += reload; /*guarda quantos disparos foram feitos*/
 		pthread_mutex_lock(&score_lock); /*tranca o score global para atualiza-lo apos zerar a propria municao*/
-		global_score += score;
+		global_score += hits;
 		printf("Score global: %d\n", global_score);
 		pthread_mutex_unlock(&score_lock);
 	}
